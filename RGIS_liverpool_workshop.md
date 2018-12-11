@@ -59,7 +59,7 @@ With these two cities, although the coordinates are right, you have no informati
 > The Coordinate Reference System or CRS of a spatial object tells R where the spatial object is located in geographic space (*see* http://spatialreference.org/).
 
 For example, you might have seen the expression WGS84, the common longitude-latitude (degree decimal), or maybe EPSG:4326.
-In other words, spatial objects should come with some information relative to their reference system (CRS), no matter if it's a raster, a point, a line of a complex polygon. To locate an object in space, you need to know the reference system and the units in which the coordinates are expressed.
+In other words, spatial objects should come with some information relative to their reference system (CRS), no matter if it's a raster, a point, a line or a complex polygon. To locate an object in space, you need to know the reference system and the units in which the coordinates are expressed.
 
 ```r
 # Adding a projection to our cities, using WGS84
@@ -77,7 +77,7 @@ legend("topleft", legend = proj_city_points$name, col = c("magenta", "blue"), pc
 text(x = -15, y = 50.2, "EPSG:4326 - WGS84", pos = 4, cex = 0.7)
 ```
 
-The advantage of having a CRS is that you can transform your coordinates, so it is expressed to other reference system (i.e. on other origin and units).
+And when you have a CRS, it is possible transform your coordinates and express them, reproject, in another reference system (i.e. on other origin and units).
 
 > *Changing Projection* (st_tranform)
 > Some projections more appropriate for representing specific geographic context. Why is their so many CRS?
