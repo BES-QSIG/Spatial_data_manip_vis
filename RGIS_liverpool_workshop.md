@@ -5,6 +5,12 @@ date: 2018-04-12 9:00:00
 author: Reto Schmucki
 ---
 
+ Together with the R script below, you will need to download the data folder available [via this link](https://drive.google.com/file/d/1jJMM_4zqrrkPvex-iJxPNAntTuKe6qt4/view?usp=sharing). The data are contained in a zip file (674Mb) that you will have to unzip and save in your working directory, or amend the path in the R script. The data used in this tutorial should be used for a training purpose only.
+ 
+ **NOTE:** This tutorial is a work-in-progress and I am expecting to maintain, edit and update the script to improve and add new material.
+
+
+
 ### Tutorial Aims:
 
 #### <a href="#SpatialObject1"> 1. What is a spatial object? </a>
