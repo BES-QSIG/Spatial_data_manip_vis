@@ -206,7 +206,7 @@ plot(st_geometry(p1[3,]), col = "blue", pch = 19, add = TRUE)
 plot(st_geometry(int_b2_b1), col = "lightblue", boder = NA, add = TRUE)
 ```
 
-#### Difference between objects
+### Difference between objects
 ```r
 poly1 <- sf::st_buffer(p1[2,], 2)
 poly2 <- sf::st_buffer(p1[2,], 4)
@@ -216,7 +216,7 @@ plot(st_geometry(dif_poly2_poly1), col = "orange", axes = TRUE)
 plot(st_geometry(poly1), col = "blue", add = TRUE)
 ```
 
-#### Union (merge and melt) objects
+### Union (merge and melt) objects
 ```r
 poly1 <- sf::st_buffer(p1[2,], 2)
 poly2 <- sf::st_buffer(p1[2,], 4)
@@ -232,11 +232,11 @@ If you like it tidy and the dplyr way? Since sf is essentally a data.frame with 
 
 
 <a name="LoadManipulate"></a>
-##### Load and manipulate spatial objects
+### Load and manipulate spatial objects
 
 Spatial data are increasingly available from the Web, from species occurrence to natural and  cultural features data, accessing spatial data is now relatively easy. For base layers, you can find many freely available data sets such as the ones provided by the Natural Earth [http://www.naturalearthdata.com], the IUCN Protected Planet database [www.protectedplanet.net], the GADM project [https://gadm.org], worldclim [http://worldclim.org/version2] the CHELSA climate data sets [http://chelsa-climate.org] or the European Environmental Agency [https://www.eea.europa.eu/data-and-maps/data#c0=5&c11=&c5=all&b_start=0]
 
-#### Raster object
+## Raster object
 ```r
 library(raster)
 # annual mean temperature
@@ -270,14 +270,14 @@ rast_stack <- raster::stack(rast_1, rast_2)
 plot(rast_stack$mean.temperature.1)
 plot(rast_stack)
 ```
-#### Land cover
+### Land cover
 ```r
 eunis_1km <- raster::raster("data/es_l1_1km.tif")
 raster::plot(eunis_1km)
 raster::projection(eunis_1km)
 ```
 
-#### Spatial extraction (raster value for a vector object)
+### Spatial extraction (raster value for a vector object)
 ```r
 proj_city_points_laea <- sf::st_transform(proj_city_points, raster::projection(eunis_1km))
 eunis_city <- raster::extract(eunis_1km, as(proj_city_points_laea, "Spatial"))
@@ -290,7 +290,7 @@ proportion <- as.numeric(table(eunis_city[[1]]))[which(names(table(eunis_city[[1
 proportion
 ```
 
-#### Vector object
+### Vector object
 ```r
 library(sf)
 st_prov <- sf::st_read("data/GADM_2.8_GBR_adm2.shp")
@@ -310,7 +310,7 @@ plot(st_prov_sp.osgb, axes = TRUE)
 spplot(st_prov_sp.osgb, "HASC_2", colorkey = FALSE)
 ```
 
-#### Read and write your spatial object in Shapefile
+### Read and write your spatial object in Shapefile
 ```r
 # read with "sf"
 st_prov <- sf::st_read("data/GADM_2.8_GBR_adm2.shp")
@@ -353,7 +353,7 @@ plot(g.bbox_sf, add = TRUE)
 > http://land.copernicus.eu/pan-european/satellite-derived-products/eu-hydro/eu-hydro-public-beta/eu-hydro-river-network/view
 
 <a name="PostgreSQ"></a>
-##### Interfacing R and PosgreSQL/PostGIS
+## Interfacing R and PosgreSQL/PostGIS
 1. Install PostgreSQL, with the PostGIS extension
 2. Create a database
 3. Populate your database
@@ -382,7 +382,7 @@ dbSendStatement(dbcon, sql_createschema)
 # have a look at your PostgreSQL database, using pgAdmin
 ```
 
-#### Send spatial data to your newly created database located on your local server
+### Send spatial data to your newly created database located on your local server
 ```r
 library(sf)
 dbcon <- dbConnect(drv, dbname = "RGIS_workshop",
@@ -407,14 +407,14 @@ new_area <- sf::st_area(sf::st_transform(new_extract, 27700))
 head(new_area)
 ```
 
-#### Interacting with PostgreSQL through your terminal
+### Interacting with PostgreSQL through your terminal
 
 > *In your terminal, type*
 > ogr2ogr -f "PostgreSQL" -t_srs EPSG:27700 PG:"host=localhost port=5432 dbname=RGIS_workshop user=postgres password=****" 'C:\\Users\\retoschm\\OneDrive - Natural Environment Research Council\\Rgis_workshop\\data\\GADM_2.8_GBR_adm2.shp' -nln public.wdpa_gbr2 -nlt MULTIPOLYGON -overwrite -progress -unsetFid --config PG_USE_COPY YES
 
-#### Some more raster operations
+### Some more raster operations
 
-##### Hillshade and Terrain map
+#### Hillshade and Terrain map
 ```r
 library(raster)
 alt <- raster::getData("alt", country = "GBR")
@@ -429,7 +429,7 @@ raster::plot(alt, col = terrain.colors(25, alpha = 0.5), add = TRUE)
 ```
 
 <a name="PlotWithggplot2"></a>
-#### Plot your spatial object data with ggplot2
+## Plot your spatial object data with ggplot2
 ```r
 library(ggplot2)
 library(ggspatial)
@@ -490,7 +490,7 @@ ggplot(data = country_sf_gbr_osgb_simpl) +
     ggtitle("GBR map", subtitle = paste0("(", length(unique(country_sf_gbr_osgb_simpl$NAME_1)), " countries)"))
 ```
 
-#### Adding a raster to a ggplot
+### Adding a raster to a ggplot
 ```r
 library(raster)
 alt <- raster::getData("alt", country = "GBR")
@@ -539,7 +539,7 @@ ggplot() +
     theme(panel.background = element_rect(fill = "aliceblue"))
 ```
 
-#### Can you plot the deer occurrence extracted from GBIF on a UK map?
+### Can you plot the deer occurrence extracted from GBIF on a UK map?
 ```r
 library(rgbif)
 deer_locations <- occ_search(scientificName = "Cervus elaphus", limit = 5000,
@@ -554,7 +554,7 @@ plot(deer_locations_sf[, "datasetKey"])
 # ===========
 ```
 
-### Your challenge, build some wider map for Europe
+## Your challenge, build some wider map for Europe
 
 Have a look at tutorial 1, 2 and 3 on how to draw beautiful map with sf.
 
