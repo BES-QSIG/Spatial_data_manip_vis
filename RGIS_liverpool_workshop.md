@@ -348,7 +348,7 @@ g.bbox <- raster::extent(as.numeric(sf::st_bbox(country_sf_gbr))[c(1,3,2,4)])
 g.bbox_sf <- sf::st_set_crs(sf::st_as_sfc(as(g.bbox, 'SpatialPolygons')), 3035)
 plot(g.bbox_sf, add = TRUE)
 ```
-> *Try it your self*
+> *Try it yourself*
 > Get some river data from
 > http://land.copernicus.eu/pan-european/satellite-derived-products/eu-hydro/eu-hydro-public-beta/eu-hydro-river-network/view
 
