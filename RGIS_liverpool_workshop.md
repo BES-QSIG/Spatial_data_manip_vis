@@ -81,6 +81,7 @@ legend("topleft", legend = proj_city_points$name, col = c("magenta", "blue"), pc
 country_sf_gbr <- sf::st_as_sf(raster::getData(name = "GADM", country = 'GBR', level = 1))
 
 # visualize the points on a map
+## if you are on a Mac, this might be very slow, see below how we will address this issues (simplify).
 plot(country_sf_gbr$geometry, graticule = TRUE, axes = TRUE, col = "wheat1", xlim = c(-15, 5), ylim = c(50, 61))
 plot(proj_city_points, pch = 19, col = c("magenta", "blue"), cex = 1.5, add = TRUE)
 legend("topleft", legend = proj_city_points$name, col = c("magenta", "blue"), pch = 19, cex = 1.5, bty="n")
@@ -115,7 +116,7 @@ text(x = -453585, y = 25000, "EPSG:27700 - OSGB 1936 ", pos = 4, cex = 0.7)
 > to get coordinates on a plot, you can use the function drawExtent() from the raster package that allow you to clic on a map to get the coordinates of an extent.
 
 ```r
-plot(country_sf_gbr_osgb$geometry, graticule = TRUE, axes = TRUE, col = "wheat1")
+plot(country_sf_gbr_osgb_simpl$geometry, graticule = TRUE, axes = TRUE, col = "wheat1")
 raster::drawExtent()
 ```
 <a name="SpatialObject2"></a>
@@ -358,6 +359,8 @@ plot(g.bbox_sf, add = TRUE)
 3. Populate your database
 4. Extract from your database
 
+**NOTE** This section with PostgreSQL require that you have a functional installation of PostgreSQL with the spatial extension PostGIS. I will add some installation instruction for Windows and Mac, later when I get some time, but if you are curious, search the web as it is a good and resourceful place to start.
+
 ## Create PostgreSQL database
 ```r
 library('RPostgreSQL')
@@ -430,9 +433,11 @@ raster::plot(alt, col = terrain.colors(25, alpha = 0.5), add = TRUE)
 ```r
 library(ggplot2)
 library(ggspatial)
+library(rmapshaper)
 
 country_sf_gbr <- sf::st_as_sf(raster::getData(name = "GADM", country = 'GBR', level = 1))
 country_sf_gbr_osgb <- sf::st_transform(country_sf_gbr, crs = 27700)
+country_sf_gbr_osgb_simpl <- ms_simplify(country_sf_gbr_osgb, keep = 0.1)
 
 point_liverpool <- data.frame(name = 'Liverpool', longitude = -2.98, latitude = 53.41)
 point_edinburgh <- data.frame(name = 'Edinburgh', longitude = -3.19, latitude = 55.95)
@@ -440,49 +445,49 @@ city_points <- rbind(point_liverpool, point_edinburgh)
 proj_city_points_osgb <- sf::st_transform(sf::st_as_sf(city_points, coords = c("longitude", "latitude"), crs = 4326), crs = 27700)
 
 ## simple plot with ggplot
-ggplot(data = country_sf_gbr_osgb) +
+ggplot(data = country_sf_gbr_osgb_simpl) +
     geom_sf() +
     xlab("Longitude") + ylab("Latitude") +
-    ggtitle("GBR map", subtitle = paste0("(", length(unique(country_sf_gbr_osgb$NAME_1)), " countries)"))
+    ggtitle("GBR map", subtitle = paste0("(", length(unique(country_sf_gbr_osgb_simpl$NAME_1)), " countries)"))
 
-## some colors
-ggplot(data = country_sf_gbr_osgb) +
+## add some colors
+ggplot(data = country_sf_gbr_osgb_simpl) +
     geom_sf(color = "black", fill = "wheat1" ) +
     xlab("Longitude") + ylab("Latitude") +
-    ggtitle("GBR map", subtitle = paste0("(", length(unique(country_sf_gbr_osgb$NAME_1)), " countries)"))
+    ggtitle("GBR map", subtitle = paste0("(", length(unique(country_sf_gbr_osgb_simpl$NAME_1)), " countries)"))
 
 ## color with some qualitative meaning
-ggplot(data = country_sf_gbr_osgb) +
-    geom_sf(aes(fill = as.numeric(sf::st_area(country_sf_gbr_osgb)))) +
+ggplot(data = country_sf_gbr_osgb_simpl) +
+    geom_sf(aes(fill = as.numeric(sf::st_area(country_sf_gbr_osgb_simpl)))) +
     scale_fill_viridis_c(option = "plasma", name = "Area") +
     xlab("Longitude") + ylab("Latitude") +
-    ggtitle("GBR map", subtitle = paste0("(", length(unique(country_sf_gbr_osgb$NAME_1)), " countries)"))
+    ggtitle("GBR map", subtitle = paste0("(", length(unique(country_sf_gbr_osgb_simpl$NAME_1)), " countries)"))
 
 # add a scale bar and a north arrow
-ggplot(data = country_sf_gbr_osgb) +
+ggplot(data = country_sf_gbr_osgb_simpl) +
     geom_sf() +
     xlab("Longitude") + ylab("Latitude") +
     annotation_scale(location = "bl", width_hint = 0.5) +
     annotation_north_arrow(location = "bl", which_north = "true",
           pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
           style = north_arrow_fancy_orienteering) +
-    ggtitle("GBR map", subtitle = paste0("(", length(unique(country_sf_gbr_osgb$NAME_1)), " countries)"))
+    ggtitle("GBR map", subtitle = paste0("(", length(unique(country_sf_gbr_osgb_simpl$NAME_1)), " countries)"))
 
 # add more spatial object with geom_sf
-ggplot(data = country_sf_gbr_osgb) +
+ggplot(data = country_sf_gbr_osgb_simpl) +
     geom_sf() +
     geom_sf(data = proj_city_points_osgb, size = 4, color = c("magenta", "blue")) +
     xlab("Longitude") + ylab("Latitude") +
     annotate(geom = "text",
-            x = sf::st_coordinates(sf::st_centroid(country_sf_gbr_osgb))[,1],
-            y = sf::st_coordinates(sf::st_centroid(country_sf_gbr_osgb))[,2],
-            label = country_sf_gbr_osgb$NAME_1,
+            x = sf::st_coordinates(sf::st_centroid(country_sf_gbr_osgb_simpl))[,1],
+            y = sf::st_coordinates(sf::st_centroid(country_sf_gbr_osgb_simpl))[,2],
+            label = country_sf_gbr_osgb_simpl$NAME_1,
         fontface = "italic", color = "grey22", size = 3)  +
     annotation_scale(location = "bl", width_hint = 0.5) +
     annotation_north_arrow(location = "bl", which_north = "true",
           pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
           style = north_arrow_fancy_orienteering) +
-    ggtitle("GBR map", subtitle = paste0("(", length(unique(country_sf_gbr_osgb$NAME_1)), " countries)"))
+    ggtitle("GBR map", subtitle = paste0("(", length(unique(country_sf_gbr_osgb_simpl$NAME_1)), " countries)"))
 ```
 
 #### Adding a raster to a ggplot
@@ -500,15 +505,15 @@ ggplot() +
     geom_tile(data = alt_prj_df, aes(x = x, y = y, fill = Altitude)) +
     xlab("Longitude") + ylab("Latitude") +
     annotate(geom = "text",
-            x = sf::st_coordinates(sf::st_centroid(country_sf_gbr_osgb))[,1],
-            y = sf::st_coordinates(sf::st_centroid(country_sf_gbr_osgb))[,2],
-            label = country_sf_gbr_osgb$NAME_1,
+            x = sf::st_coordinates(sf::st_centroid(country_sf_gbr_osgb_simpl))[,1],
+            y = sf::st_coordinates(sf::st_centroid(country_sf_gbr_osgb_simpl))[,2],
+            label = country_sf_gbr_osgb_simpl$NAME_1,
         fontface = "italic", color = "white", size = 3) +
     annotation_scale(location = "bl", width_hint = 0.5) +
     annotation_north_arrow(location = "bl", which_north = "true",
           pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
           style = north_arrow_fancy_orienteering) +
-    ggtitle("GBR map", subtitle = paste0("(", length(unique(country_sf_gbr_osgb$NAME_1)), " countries)")) +
+    ggtitle("GBR map", subtitle = paste0("(", length(unique(country_sf_gbr_osgb_simpl$NAME_1)), " countries)")) +
     theme(panel.background = element_rect(fill = "aliceblue"))
 
 ## second method (better)
@@ -517,14 +522,14 @@ alt_prj_df2 <- as.data.frame(alt_prj_spdf)
 colnames(alt_prj_df2) <- c("Altitude", "x", "y")
 
 ggplot() +
-    geom_sf(data = country_sf_gbr_osgb) +
+    geom_sf(data = country_sf_gbr_osgb_simpl) +
     geom_tile(data = alt_prj_df2, aes(x = x, y = y, fill = Altitude)) +
     geom_sf(data = proj_city_points_osgb, size = 4, color = c("magenta", "blue")) +
     xlab("Longitude") + ylab("Latitude") +
     annotate(geom = "text",
-            x = sf::st_coordinates(sf::st_centroid(country_sf_gbr_osgb))[,1],
-            y = sf::st_coordinates(sf::st_centroid(country_sf_gbr_osgb))[,2],
-            label = country_sf_gbr_osgb$NAME_1,
+            x = sf::st_coordinates(sf::st_centroid(country_sf_gbr_osgb_simpl))[,1],
+            y = sf::st_coordinates(sf::st_centroid(country_sf_gbr_osgb_simpl))[,2],
+            label = country_sf_gbr_osgb_simpl$NAME_1,
         fontface = "italic", color = "white", size = 3) +
     annotation_scale(location = "bl", width_hint = 0.5) +
     annotation_north_arrow(location = "bl",which_north = "true",
