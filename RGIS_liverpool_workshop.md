@@ -122,7 +122,7 @@ raster::drawExtent()
 <a name="SpatialObject2"></a>
 #### Building and working with spatial objects using sf in R
 
-This is a revolution, providing a modern, stronger and cleaner workflow to deal with spatial object in R, at least vector data. The "sf" is developed by some of the same people that provide us with "sp", offering an ecosystem that open new opportunities to do GIS in R. The firs place to look for resource is the sf package website https://r-spatial.github.io/sf/index.html, this a first stop to learn how it work and develop new skills in R.
+This is a revolution, providing a modern, stronger and cleaner workflow to deal with spatial object in R, at least vector data. The "sf" is developed by some of the same people that provide us with "sp", offering an ecosystem that open new opportunities to do GIS in R. The firs place to look for resource is the [sf package website](https://r-spatial.github.io/sf/index.html), this is your first stop to learn how it works and develop new skills in R spatial.
 
 ```r
 library(sf)
