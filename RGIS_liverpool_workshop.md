@@ -120,7 +120,7 @@ plot(country_sf_gbr_osgb_simpl$geometry, graticule = TRUE, axes = TRUE, col = "w
 raster::drawExtent()
 ```
 <a name="SpatialObject2"></a>
-#### Building and working with spatial objects using sf in R
+## Building and working with spatial objects using sf in R
 
 This is a revolution, providing a modern, stronger and cleaner workflow to deal with spatial object in R, at least vector data. The "sf" is developed by some of the same people that provide us with "sp", offering an ecosystem that open new opportunities to do GIS in R. The firs place to look for resource is the [sf package website](https://r-spatial.github.io/sf/index.html), this is your first stop to learn how it works and develop new skills in R spatial.
 
@@ -138,7 +138,7 @@ plot(p3, col = "blue", pch = 19)
 plot(p2, col = "magenta", pch = 19, add = TRUE)
 ```
 
-## Modify sf - sfc objects
+### Modify sf - sfc objects
 ```r
 p6 <- sf::st_cast(x = st_sfc(p3), to = "POINT")
 p_multi <- sf::st_cast(p6, ids = c(1, 2, 1, 2), group_or_plist = TRUE, to = "MULTIPOINT")
