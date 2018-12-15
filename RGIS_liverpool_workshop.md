@@ -6,7 +6,7 @@ author: Reto Schmucki
 ---
 
  Together with the R script below, you will need to download the data folder available [via this link](https://drive.google.com/file/d/1jJMM_4zqrrkPvex-iJxPNAntTuKe6qt4/view?usp=sharing). The data are contained in a zip file (674Mb) that you will have to unzip and save in your working directory, or amend the path in the R script. The data used in this tutorial should be used for a training purpose only.
- 
+
  **NOTE:** This tutorial is a work-in-progress and I am expecting to maintain, edit and update the script to improve and add new material.
 
 
@@ -27,19 +27,23 @@ For this "tutorial", you will need some packages and their dependencies
 ```r
 if(!requireNamespace("raster")) install.packages("raster")
 if(!requireNamespace("sf")) install.packages("sf")
+if(!requireNamespace("rmapshaper")) install.packages("rmapshaper")
 if(!requireNamespace("ggplot2")) install.packages("ggplot2")
 if(!requireNamespace("ggspatial")) install.packages("ggspatial")
 if(!requireNamespace("rgdal")) install.packages("rgdal")
 if(!requireNamespace("RPostgreSQL")) install.packages("RPostgreSQL")
 if(!requireNamespace("rgbif")) install.packages("rgbif")
 
+
 library(raster)
 library(sf)
+library(rmapshaper)
 library(ggplot2)
 library(ggspatial)
 library(RPostgreSQL)
 library(rgdal)
 library(rgbif)
+
 ```
 
 <a name="SpatialObject1"></a>
@@ -83,23 +87,31 @@ legend("topleft", legend = proj_city_points$name, col = c("magenta", "blue"), pc
 text(x = -15, y = 50.2, "EPSG:4326 - WGS84", pos = 4, cex = 0.7)
 ```
 
-And when you have a CRS, it is possible transform your coordinates and express them, reproject, in another reference system (i.e. on other origin and units).
-
-> *Changing Projection* (st_tranform)
-> Some projections more appropriate for representing specific geographic context. Why is their so many CRS?
+And when you have a CRS, it is possible transform your coordinates and express them, reproject, in another reference system (i.e. on other origin and units). You can change an geometry's projection with the function `st_tranform` from [sf](https://cran.r-project.org/web/packages/sf/) package. Some projections are more appropriate for representing and extract specific metric (e.g. distance, area) from geometry.
 
 ```r
 # Reproject your city points in OSGB 1936 / British National Grid (EPSG:27700)
 proj_city_points_osgb <- sf::st_transform(proj_city_points, crs = 27700)
 country_sf_gbr_osgb <- sf::st_transform(country_sf_gbr, crs = 27700)
+```
 
-# visualize the points on a map
-dev.new()
-plot(country_sf_gbr_osgb$geometry, graticule = TRUE, axes = TRUE, col = "wheat1", xlim = c(-333585, 713000), ylim = c(20000, 1290000))
+The sf object containing the Great Britain geometry is relatively big, with much detail at high at a resolution level that might be unnecessary when mapping GB. You can simplify the polygon by changing the resolution and the number of points defining your polygons. This can be done with the function `st_simplify` available in [sf](https://cran.r-project.org/web/packages/sf/) or the `ms_simplify` function from the [rmapshaper](https://cran.r-project.org/web/packages/rmapshaper/) package. When simplifying multiple polygons, you need to keep the topology to avoid creation of slivers and holes between polygons. Simplifying your geometry can be particularly helpful as it will speed up the plotting process, an issues that can be particularly acute on MacOS and slowing the rendering of your map.
+
+```r
+country_sf_gbr_osgb_simpl <- ms_simplify(country_sf_gbr_osgb, keep = 0.1)
+
+object.size(country_sf_gbr_osgb_simpl)
+object.size(country_sf_gbr_osgb)
+
+# visualise the points on a map of GB, with a simplified geometry
+
+plot(country_sf_gbr_osgb_simpl$geometry, graticule = TRUE, axes = TRUE, col = "wheat1", xlim = c(-333585, 713000), ylim = c(20000, 1290000))
 plot(proj_city_points_osgb, pch = 19, col = c("magenta", "blue"), cex = 1.5, add = TRUE)
 legend("topleft", legend = proj_city_points_osgb$name, col = c("magenta", "blue"), pch = 19, cex = 1.5, bty="n")
 text(x = -453585, y = 25000, "EPSG:27700 - OSGB 1936 ", pos = 4, cex = 0.7)
+
 ```
+
 > to get coordinates on a plot, you can use the function drawExtent() from the raster package that allow you to clic on a map to get the coordinates of an extent.
 
 ```r
